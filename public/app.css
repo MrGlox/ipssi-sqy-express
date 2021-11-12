@@ -1,3 +1,7 @@
 body {
   color: blue;
 }
+
+.newUser {
+  font-style: italic;
+}
