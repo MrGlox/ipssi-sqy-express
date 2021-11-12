@@ -1,16 +1,17 @@
 <h1>Sign up</h1>
-<form action="" method="POST">
+<form action="/signup" method="POST">
     <fieldset>
     <label for="email">E mail</label>
-    <input type="email" name="email">
+    <input type="email" name="email" required>
     </fieldset>
     <fieldset>
     <label for="name">Pseudo</label>
-    <input type="text" name="name">
+    <input type="text" name="name" required>
     </fieldset>
     <fieldset>
     <label for="password">Password</label>
-    <input type="password" name="password">
+    <input type="password" name="password" required>
     </fieldset>
+    <input type="submit" value="Envoyer">
 </form>
 <a href="/signin">Go to Sign in</a>

@@ -1,5 +1,3 @@
-console.log("test");
-
 const socket = io();
 
 const form = document.forms[0];
@@ -9,7 +7,6 @@ const list = document.querySelector("ul");
 
 form.addEventListener("submit", (ev) => {
   ev.preventDefault();
-  console.log(input.value);
 
   socket.emit("message", input.value);
   input.value = "";
