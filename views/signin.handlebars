@@ -1,4 +1,7 @@
 <h1>Sign in</h1>
+{{#if message}}
+<h2>{{message}}</h2>
+{{/if}}
 <form action="" method="POST">
     <fieldset>
     <label for="email">E mail</label>
@@ -8,5 +11,6 @@
     <label for="password">Password</label>
     <input type="password" name="password">
     </fieldset>
+    <input type="submit" value="Envoyer">
 </form>
 <a href="/signup">Go to Sign up</a>

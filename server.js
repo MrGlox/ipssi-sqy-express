@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 // NODE dependencies
 // const path = require("path");
 const http = require("http");
@@ -7,7 +11,9 @@ const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
 
 const express = require("express");
+const flash = require("express-flash");
 const exphbs = require("express-handlebars");
+const session = require("express-session");
 
 const passport = require("passport");
 
@@ -19,6 +25,13 @@ const server = http.createServer(app);
 
 const { Server } = require("socket.io");
 const io = new Server(server);
+
+const initPassport = require("./passport/setup.js");
+initPassport(
+  passport,
+  (email) => users.find((user) => user.email === email),
+  (id) => users.find((user) => user.id === id)
+);
 
 /**
  * INIT VIEW ENGINE
@@ -43,6 +56,22 @@ app.use(
 );
 
 /**
+ * INIT SESSION
+ */
+app.use(
+  session({
+    secret: process.env.API_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(flash());
+
+/**
  * HANDLE USERS
  */
 const users = [];
@@ -50,8 +79,20 @@ const users = [];
 /**
  * HANDLE ROUTES
  */
-app.get("/", (request, response) => response.render("home"));
-app.get("/signin", (request, response) => response.render("signin"));
+app.get(
+  "/",
+  (request, response, next) => {
+    if (!request.isAuthenticated()) {
+      response.redirect("/signin");
+    }
+
+    next();
+  },
+  (request, response) => response.render("home", { name: request.user.name })
+);
+app.get("/signin", (request, response) =>
+  response.render("signin", { message: request.flash("error") })
+);
 app.get("/signup", (request, response) => response.render("signup"));
 
 app.post("/signup", (request, response) => {
@@ -74,6 +115,20 @@ app.post("/signup", (request, response) => {
     res.redirect("/signup");
     throw err;
   }
+});
+
+app.post(
+  "/signin",
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/signin",
+    failureFlash: true, // "Invalid username or password."
+  })
+);
+
+app.get("/logout", (req, res) => {
+  req.logOut();
+  res.redirect("/signin");
 });
 
 /**
